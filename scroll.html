@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Scroll with Observer</title>
+	<style>
+		* {
+			box-sizing: border-box
+		}
+
+		button:focus {
+			outline: none;
+		}
+
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: monospace;
+		}
+
+		.content-wrapper {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			margin-top: 50px;
+		}
+
+		.box_wrapper {
+			display: flex;
+			justify-content: flex-start;
+			align-items: flex-start;
+			flex-direction: row;
+			width: 600px;
+			height: auto;
+			background-color: red;
+			border: 5px solid orange;
+			overflow-x: auto;
+		}
+
+		.box-item {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-shrink: 0;
+			width: 200px;
+			height: 400px;
+			font-size: 30px;
+			border: 1px solid black;
+			transition-duration: 0.4s;
+		}
+
+		.box-item.active {
+			background-color: #006d80;
+			color: white;
+		}
+
+		button {
+			margin-top: 10px;
+			padding: 10px 0;
+			width: 600px;
+			font-size: 18px;
+			border: 1px solid black;
+			cursor: pointer;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="content-wrapper">
+		<div class="box_wrapper">
+			<div class="box-item">1</div>
+			<div class="box-item">2</div>
+			<div class="box-item">3</div>
+			<div class="box-item">4</div>
+			<div class="box-item">5</div>
+			<div class="box-item">6</div>
+		</div>
+		<button right>Next</button>
+	</div>
+
+	<script>
+		const myBars = document.querySelectorAll('.box-item');
+		const rightButton = document.querySelector("[right]");
+		const wrap = document.querySelector(".box_wrapper");
+
+		//new observer
+		const observer = new IntersectionObserver((entries, observer) => {
+
+			entries.forEach(entry => {
+				console.log(entry)
+				if (entry.isIntersecting) {
+					entry.target.classList.add('active');
+				} else {
+					entry.target.classList.remove('active');
+				}
+
+			});
+
+		}, { threshold: 0.8 });
+
+		Array.prototype.forEach.call(myBars, (el) => {
+			observer.observe(el);
+		});
+
+		rightButton.addEventListener("click", function () {
+			var totalElements = [...wrap.children];
+			var scrollElements = [...document.querySelectorAll(".box-item")];
+			var activeElement = document.querySelectorAll(".active");
+			var lastItem = [...activeElement].pop();
+			var lastElement = scrollElements[scrollElements.length - 1];
+			if (lastItem != lastElement) {
+				var itemIndex = totalElements.indexOf(lastItem);
+				var elementWidth = lastItem.nextElementSibling.offsetWidth;
+				// var currentScrollPosition = wrap.scrollLeft || 0;
+				wrap.scroll((elementWidth * (itemIndex - 1)), 0);
+			}
+		})
+	</script>
+
+</body>
+
+</html>
